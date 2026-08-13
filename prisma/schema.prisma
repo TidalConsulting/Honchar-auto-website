@@ -1,0 +1,151 @@
+// Honchar Auto — data model
+// Postgres in production (Vercel/Neon/Supabase). See README for setup.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  OWNER
+  STAFF
+}
+
+enum Condition {
+  NEW
+  USED
+  CERTIFIED
+}
+
+enum VehicleStatus {
+  DRAFT
+  PUBLISHED
+  SOLD
+}
+
+enum LeadType {
+  AVAILABILITY
+  FINANCING
+  TRADE
+  GENERAL
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(STAFF)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Vehicle {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  stockNumber String? @unique
+  vin         String?
+
+  // Identity
+  year      Int
+  make      String
+  model     String
+  trim      String?
+  bodyType  String
+  condition Condition @default(USED)
+
+  // Pricing
+  price         Int // whole dollars
+  msrp          Int?
+  previousPrice Int? // set automatically when price is lowered -> renders a price-drop badge
+
+  // Usage
+  mileage     Int?
+  engineHours Int?
+
+  // Powertrain
+  engine       String?
+  fuelType     String?
+  transmission String?
+  drivetrain   String?
+  axleConfig   String?
+
+  // Commercial / construction specs
+  gvwr            Int? // lbs
+  gvwrClass       Int? // 3-8
+  cdlRequired     Boolean @default(false)
+  payloadCapacity Int? // lbs
+  towingCapacity  Int? // lbs
+  bodyLength      Float? // feet
+  pto             Boolean @default(false)
+  hydraulics      Boolean @default(false)
+
+  // Appearance
+  exteriorColor String?
+  interiorColor String?
+  doors         Int?
+  seats         Int?
+
+  // Content
+  description String?
+  features    String[] @default([])
+  location    String?
+
+  status   VehicleStatus @default(PUBLISHED)
+  featured Boolean       @default(false)
+
+  images VehicleImage[]
+  leads  Lead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([bodyType])
+  @@index([make])
+  @@index([price])
+  @@map("vehicles")
+}
+
+model VehicleImage {
+  id        String  @id @default(cuid())
+  vehicleId String
+  url       String
+  alt       String?
+  position  Int     @default(0)
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, position])
+  @@map("vehicle_images")
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  vehicleId String?
+  name      String
+  email     String
+  phone     String?
+  message   String?
+  type      LeadType   @default(AVAILABILITY)
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@map("leads")
+}

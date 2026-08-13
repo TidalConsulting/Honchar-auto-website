@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-50: #f6f7f9;
+  --color-ink-100: #eceef2;
+  --color-ink-200: #d7dbe3;
+  --color-ink-300: #b4bbc8;
+  --color-ink-400: #8a94a6;
+  --color-ink-500: #67718a;
+  --color-ink-600: #4e5769;
+  --color-ink-700: #3a4152;
+  --color-ink-800: #262c39;
+  --color-ink-900: #171c26;
+  --color-ink-950: #0d1118;
+
+  --color-amber-brand-50: #fff8ec;
+  --color-amber-brand-100: #ffedcc;
+  --color-amber-brand-200: #ffd894;
+  --color-amber-brand-300: #ffbe57;
+  --color-amber-brand-400: #ffa62b;
+  --color-amber-brand-500: #f98a07;
+  --color-amber-brand-600: #dd6702;
+  --color-amber-brand-700: #b74806;
+  --color-amber-brand-800: #94380c;
+  --color-amber-brand-900: #7a300d;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 0.875rem;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink-50);
+  color: var(--color-ink-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Consistent focus ring across the site */
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--color-amber-brand-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hide the number-input spinners in filter fields */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
