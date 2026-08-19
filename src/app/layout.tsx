@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 
 import "./globals.css";
 import { site } from "@/lib/site";
+import { siteUrl } from "@/lib/url";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -11,15 +12,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
     default: `${site.name} — ${site.tagline}`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
+  alternates: { canonical: "/" },
   openGraph: {
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
+    siteName: site.name,
+    locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name} — ${site.tagline}`,
+    description: site.description,
   },
 };
 

@@ -44,7 +44,8 @@ fill it in and you become the owner. If you ran the seed, sign in with
 
 ```bash
 npm run dev         # development server
-npm run build       # production build (runs prisma generate first)
+npm run build       # production build (generates the client, migrates, then builds)
+npm run build:nodb  # build without touching the database
 npm run start       # serve the production build
 npm run lint        # eslint
 npm run db:migrate  # create + apply a migration after editing the schema
@@ -55,31 +56,54 @@ npm run db:studio   # browse the database in a GUI
 
 ---
 
-## Deploying to Vercel
+## Going live on Vercel
 
-1. **Create the database.** In the Vercel dashboard → Storage → create a Postgres
-   store (Neon works well). Vercel will offer the connection strings.
-2. **Import the repo** into Vercel as a new project. Framework preset: Next.js.
-3. **Set environment variables** (Project → Settings → Environment Variables):
+Roughly 20 minutes, all of it in the Vercel dashboard.
 
-   | Name                    | Value                                                       |
-   | ----------------------- | ----------------------------------------------------------- |
-   | `DATABASE_URL`          | pooled connection string from step 1                        |
-   | `DIRECT_URL`            | direct (non-pooled) connection string                       |
-   | `AUTH_SECRET`           | output of `openssl rand -base64 32`                         |
-   | `BLOB_READ_WRITE_TOKEN` | created automatically when you connect a Vercel Blob store  |
+**1. Import the repo.** New Project → pick this repository → framework preset Next.js.
+Set the **production branch** under Settings → Git to whichever branch you want live.
 
-4. **Create the Blob store** (Storage → Blob → Connect Project) so photo uploads
-   have somewhere to live. Serverless filesystems are read-only, so this is required
-   in production — without it, uploads will fail.
-5. **Deploy.** The build runs `prisma migrate deploy` before `next build`, so the
-   database schema is created on the first deploy.
-6. Visit `https://your-domain/admin` and create the owner account.
+**2. Create the database.** Storage → create a Postgres store (Neon is Vercel's default)
+→ connect it to this project. It injects the connection strings automatically.
 
-### Custom domain
+**3. Create the Blob store.** Storage → Blob → connect to this project. This is
+**required**, not optional — Vercel's filesystem is read-only, so without it every photo
+upload fails.
 
-Vercel → Project → Settings → Domains → add `honcharauto.com`, then point the
-registrar's nameservers or A/CNAME records at Vercel as instructed there.
+**4. Add two environment variables** (Settings → Environment Variables):
+
+| Name                    | Value                                              |
+| ----------------------- | -------------------------------------------------- |
+| `AUTH_SECRET`           | output of `openssl rand -base64 32` — required     |
+| `NEXT_PUBLIC_SITE_URL`  | `https://yourdomain.com` — add once the domain is live |
+
+You do **not** need to hand-copy database URLs. The build resolves whatever names your
+provider injected (`DATABASE_URL`, `POSTGRES_PRISMA_URL`, `DATABASE_URL_UNPOOLED`,
+`POSTGRES_URL_NON_POOLING`) and picks a pooled and a direct connection itself. If
+something genuinely required is missing, the build stops with a message saying exactly
+what to add — see `scripts/migrate.mjs`.
+
+**5. Deploy.** The build runs the database migrations first, so the tables are created on
+that first deploy.
+
+**6. Create the owner account.** Visit `https://your-site/admin`. With no accounts in the
+database yet, it shows a one-time setup form. Fill it in and you're the owner. That form
+disappears permanently once an account exists.
+
+**7. Add the domain.** Settings → Domains → add `honcharauto.com`. Vercel shows the exact
+DNS records to paste at the registrar. Then set `NEXT_PUBLIC_SITE_URL` to the real domain
+and redeploy so canonical links and the sitemap point at it.
+
+### After it's live
+
+- **Search engines.** `robots.txt` and `sitemap.xml` are generated automatically, and the
+  sitemap lists every published truck. Submit `https://yourdomain.com/sitemap.xml` in
+  Google Search Console to speed up indexing.
+- **The dashboard is excluded** from indexing at both the robots and page-metadata level.
+- **Demo data.** Production starts empty. Don't run `npm run db:seed` against it — that
+  command deletes all vehicles before inserting the 18 demo trucks.
+- **Backups.** Neon keeps automatic point-in-time backups on paid tiers; on the free tier,
+  take a periodic `pg_dump` if the inventory matters.
 
 ---
 
@@ -148,6 +172,8 @@ deliberate.
 prisma/
   schema.prisma            data model
   seed.ts                  demo inventory
+scripts/
+  migrate.mjs              resolves database env vars, migrates during deploy
 src/
   app/
     (site)/                public site — landing, inventory, detail, about, etc.
@@ -158,6 +184,8 @@ src/
   components/              shared UI; components/admin/* is dashboard-only
   lib/                     data access, auth, formatting, finance, site config
   proxy.ts                 redirects signed-out visitors away from /admin
+  app/robots.ts            search-engine rules
+  app/sitemap.ts           every public page plus one entry per listed truck
 ```
 
 ## Security notes
