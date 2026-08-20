@@ -10,6 +10,7 @@
  */
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 
 /**
  * Loads .env files the way the Prisma CLI does, so local builds work without
@@ -55,6 +56,21 @@ function fail(message) {
   process.exit(1);
 }
 
+/**
+ * Prints which of the variables we care about are present, without their
+ * values. When a deploy fails, this one block says whether the database was
+ * ever connected — which is otherwise invisible in a build log.
+ */
+function reportEnv() {
+  const seen = (name) => (process.env[name]?.trim() ? "set" : "—  ");
+  const names = [...new Set([...POOLED, ...DIRECT, "AUTH_SECRET", "BLOB_READ_WRITE_TOKEN"])];
+  console.log("Environment:");
+  for (const name of names) console.log(`  ${seen(name)}  ${name}`);
+  console.log("");
+}
+
+reportEnv();
+
 const pooled = firstSet(POOLED);
 if (!pooled) {
   fail(
@@ -87,7 +103,20 @@ if (!process.env.BLOB_READ_WRITE_TOKEN && process.env.VERCEL) {
 console.log(`→ Database: using ${pooled.name}`);
 console.log(`→ Migrations: using ${direct.name}${direct.name === pooled.name ? " (pooled — fine for most providers)" : ""}`);
 
-const result = spawnSync("npx", ["prisma", "migrate", "deploy"], {
+// Call the installed binary directly rather than through npx, which can try
+// to resolve or fetch a package in a CI environment.
+const prismaBin = path.join(
+  process.cwd(),
+  "node_modules",
+  ".bin",
+  process.platform === "win32" ? "prisma.cmd" : "prisma",
+);
+const runner = existsSync(prismaBin) ? prismaBin : "npx";
+const args = existsSync(prismaBin)
+  ? ["migrate", "deploy"]
+  : ["prisma", "migrate", "deploy"];
+
+const result = spawnSync(runner, args, {
   stdio: "inherit",
   env: { ...process.env, DATABASE_URL: pooled.value, DIRECT_URL: direct.value },
 });
