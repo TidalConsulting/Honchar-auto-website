@@ -107,6 +107,16 @@ model Vehicle {
   status   VehicleStatus @default(PUBLISHED)
   featured Boolean       @default(false)
 
+  // Sales history, for the dashboard metrics.
+  // listedAt is stamped the first time a vehicle goes live, so days-on-market
+  // doesn't count time spent as an unphotographed draft. originalPrice is the
+  // asking price at that moment, so "sold at % of list" measures against what
+  // was first asked rather than a later reduction.
+  listedAt      DateTime?
+  originalPrice Int?
+  soldAt        DateTime?
+  soldPrice     Int?
+
   images VehicleImage[]
   leads  Lead[]
 
@@ -114,6 +124,8 @@ model Vehicle {
   updatedAt DateTime @updatedAt
 
   @@index([status, createdAt])
+  @@index([soldAt])
+  @@index([listedAt])
   @@index([bodyType])
   @@index([make])
   @@index([price])
@@ -148,4 +160,20 @@ model Lead {
 
   @@index([status, createdAt])
   @@map("leads")
+}
+
+/// One row per page view. Sessions are derived by grouping on sessionId, which
+/// is generated in the browser and held in sessionStorage — no cookies, no IP
+/// addresses, nothing that identifies a person.
+model PageView {
+  id        String   @id
+  sessionId String
+  path      String
+  /// Time the visitor spent on this page, filled in by a beacon when they leave.
+  dwellMs   Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([sessionId])
+  @@map("page_views")
 }

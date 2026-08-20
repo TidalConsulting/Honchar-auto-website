@@ -572,10 +572,19 @@ async function main() {
 
   await prisma.vehicle.deleteMany({});
 
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+
   let stock = 1000;
-  for (const vehicle of VEHICLES) {
+  for (const [index, vehicle] of VEHICLES.entries()) {
     const { features, ...rest } = vehicle;
     const base = `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim ?? ""} ${vehicle.bodyType}`;
+    const status = vehicle.status ?? "PUBLISHED";
+
+    // Stagger listing dates so days-on-market and "longest on the lot" have
+    // something realistic to report in the demo data.
+    const listedAt = new Date(now - (14 + index * 9) * DAY);
+    const sold = status === "SOLD";
 
     await prisma.vehicle.create({
       data: {
@@ -584,12 +593,49 @@ async function main() {
         slug: slugify(base),
         stockNumber: `HA-${stock++}`,
         location: "Cape Coral, FL",
-        status: vehicle.status ?? "PUBLISHED",
+        status,
+        listedAt,
+        originalPrice: vehicle.price,
+        ...(sold
+          ? {
+              soldAt: new Date(listedAt.getTime() + 26 * DAY),
+              soldPrice: Math.round(vehicle.price * 0.94),
+            }
+          : {}),
       },
     });
   }
 
-  console.log(`Seeded ${VEHICLES.length} vehicles.`);
+  // A couple more completed sales so the averages aren't drawn from one data
+  // point. These are demo records; production starts empty.
+  const extraSales = [
+    { title: "2019 Ford F-250 Super Duty", price: 38900, soldFor: 37000, days: 19 },
+    { title: "2020 Ram ProMaster 2500 Cargo Van", price: 31500, soldFor: 29750, days: 41 },
+  ];
+  for (const [index, sale] of extraSales.entries()) {
+    const listedAt = new Date(now - (sale.days + 30) * DAY);
+    await prisma.vehicle.create({
+      data: {
+        year: Number(sale.title.slice(0, 4)),
+        make: sale.title.split(" ")[1],
+        model: sale.title.split(" ").slice(2).join(" "),
+        bodyType: sale.title.includes("Van") ? "Cargo Van" : "Pickup Truck",
+        price: sale.price,
+        slug: slugify(`${sale.title} sold ${index}`),
+        stockNumber: `HA-${stock++}`,
+        location: "Cape Coral, FL",
+        status: "SOLD",
+        description: "Sold. Kept online because the listing still brings in searches.",
+        features: [],
+        listedAt,
+        originalPrice: sale.price,
+        soldAt: new Date(listedAt.getTime() + sale.days * DAY),
+        soldPrice: sale.soldFor,
+      },
+    });
+  }
+
+  console.log(`Seeded ${VEHICLES.length + extraSales.length} vehicles.`);
 }
 
 main()

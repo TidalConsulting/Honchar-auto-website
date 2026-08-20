@@ -200,18 +200,63 @@ export function AdminInventoryTable({ vehicles }: { vehicles: Row[] }) {
 }
 
 function StatusMenu({ vehicle }: { vehicle: Row }) {
+  const [sellingPrice, setSellingPrice] = useState<string | null>(null);
+
   const next =
     vehicle.status === "PUBLISHED"
-      ? [
-          { value: "SOLD", label: "Mark sold" },
-          { value: "DRAFT", label: "Unpublish" },
-        ]
+      ? [{ value: "DRAFT", label: "Unpublish" }]
       : vehicle.status === "DRAFT"
         ? [{ value: "PUBLISHED", label: "Publish" }]
         : [{ value: "PUBLISHED", label: "Relist" }];
 
+  // Marking a vehicle sold is the one moment the final price is known. Asking
+  // for it here is what makes "sold at % of list" possible at all — it's
+  // optional, so it never blocks recording the sale.
+  const markSold = vehicle.status === "PUBLISHED" && (
+    sellingPrice === null ? (
+      <button
+        type="button"
+        onClick={() => setSellingPrice("")}
+        className="rounded-lg border border-ink-300 px-2.5 py-1.5 text-xs font-semibold text-ink-700 hover:bg-ink-50"
+      >
+        Mark sold
+      </button>
+    ) : (
+      <form action={setVehicleStatus} className="flex items-center gap-1.5">
+        <input type="hidden" name="id" value={vehicle.id} />
+        <input type="hidden" name="status" value="SOLD" />
+        <label className="flex items-center gap-1">
+          <span className="text-xs font-semibold text-ink-600">Sold for</span>
+          <input
+            name="soldPrice"
+            inputMode="numeric"
+            autoFocus
+            value={sellingPrice}
+            onChange={(event) => setSellingPrice(event.target.value.replace(/[^0-9]/g, ""))}
+            placeholder={String(vehicle.price)}
+            className="w-24 rounded-lg border border-ink-300 px-2 py-1.5 text-xs text-ink-900"
+          />
+        </label>
+        <button
+          type="submit"
+          className="rounded-lg bg-ink-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-ink-800"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={() => setSellingPrice(null)}
+          className="rounded-lg border border-ink-300 px-2.5 py-1.5 text-xs font-semibold text-ink-700"
+        >
+          Cancel
+        </button>
+      </form>
+    )
+  );
+
   return (
     <>
+      {markSold}
       {next.map((option) => (
         <form key={option.value} action={setVehicleStatus}>
           <input type="hidden" name="id" value={vehicle.id} />

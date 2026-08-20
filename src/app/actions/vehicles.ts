@@ -105,9 +105,13 @@ async function uniqueSlug(data: VehicleInput, currentId?: string) {
 
 function toCreateData(data: VehicleInput, slug: string) {
   const { images, ...rest } = data;
+  const live = rest.status === "PUBLISHED";
   return {
     ...rest,
     slug,
+    // Stamp the listing clock only once it's actually visible to shoppers.
+    listedAt: live ? new Date() : null,
+    originalPrice: live ? rest.price : null,
     images: {
       create: images.map((image, index) => ({
         url: image.url,
@@ -165,7 +169,14 @@ export async function updateVehicle(
 
   const existing = await prisma.vehicle.findUnique({
     where: { id: vehicleId },
-    select: { price: true, previousPrice: true },
+    select: {
+      price: true,
+      previousPrice: true,
+      status: true,
+      listedAt: true,
+      originalPrice: true,
+      soldAt: true,
+    },
   });
   if (!existing) return { status: "error", message: "That vehicle no longer exists." };
 
@@ -176,6 +187,9 @@ export async function updateVehicle(
   const previousPrice =
     rest.price < existing.price ? existing.price : rest.price > existing.price ? null : existing.previousPrice;
 
+  const goingLive = rest.status === "PUBLISHED" && !existing.listedAt;
+  const goingSold = rest.status === "SOLD" && existing.status !== "SOLD";
+
   try {
     await prisma.$transaction([
       prisma.vehicleImage.deleteMany({ where: { vehicleId } }),
@@ -185,6 +199,10 @@ export async function updateVehicle(
           ...rest,
           slug,
           previousPrice,
+          // The listing clock starts the first time it goes live and is never reset.
+          listedAt: goingLive ? new Date() : existing.listedAt,
+          originalPrice: goingLive ? rest.price : (existing.originalPrice ?? null),
+          soldAt: goingSold ? new Date() : existing.soldAt,
           images: {
             create: images.map((image, index) => ({
               url: image.url,
@@ -226,9 +244,28 @@ export async function setVehicleStatus(formData: FormData) {
   const status = String(formData.get("status") ?? "");
   if (!id || !["DRAFT", "PUBLISHED", "SOLD"].includes(status)) return;
 
+  const existing = await prisma.vehicle.findUnique({
+    where: { id },
+    select: { price: true, status: true, listedAt: true, originalPrice: true, soldAt: true },
+  });
+  if (!existing) return;
+
+  // An optional final sale price, captured when marking a vehicle sold.
+  const rawSold = String(formData.get("soldPrice") ?? "").replace(/[^0-9]/g, "");
+  const soldPrice = rawSold ? Number(rawSold) : null;
+
+  const goingLive = status === "PUBLISHED" && !existing.listedAt;
+  const goingSold = status === "SOLD" && existing.status !== "SOLD";
+
   await prisma.vehicle.update({
     where: { id },
-    data: { status: status as "DRAFT" | "PUBLISHED" | "SOLD" },
+    data: {
+      status: status as "DRAFT" | "PUBLISHED" | "SOLD",
+      listedAt: goingLive ? new Date() : existing.listedAt,
+      originalPrice: goingLive ? existing.price : (existing.originalPrice ?? null),
+      soldAt: goingSold ? new Date() : existing.soldAt,
+      ...(soldPrice !== null && status === "SOLD" ? { soldPrice } : {}),
+    },
   });
 
   revalidatePath("/");

@@ -2,7 +2,9 @@ import Link from "next/link";
 
 import { AdminInventoryTable } from "@/components/admin/AdminInventoryTable";
 import { FlashMessage } from "@/components/admin/FlashMessage";
+import { MetricsPanel } from "@/components/admin/MetricsPanel";
 import { formatPrice } from "@/lib/format";
+import { getDashboardMetrics } from "@/lib/metrics";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +42,7 @@ export default async function AdminInventoryPage({
       : {}),
   };
 
-  const [vehicles, counts, totals] = await Promise.all([
+  const [vehicles, counts, totals, metrics] = await Promise.all([
     prisma.vehicle.findMany({
       where,
       orderBy: { updatedAt: "desc" },
@@ -49,6 +51,7 @@ export default async function AdminInventoryPage({
     }),
     prisma.vehicle.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.vehicle.aggregate({ where: { status: "PUBLISHED" }, _sum: { price: true } }),
+    getDashboardMetrics(),
   ]);
 
   const countFor = (status: string) =>
@@ -59,6 +62,8 @@ export default async function AdminInventoryPage({
   return (
     <div>
       <FlashMessage />
+
+      <MetricsPanel metrics={metrics} />
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>

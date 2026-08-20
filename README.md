@@ -162,6 +162,45 @@ through them; the nav badge counts the new ones.
 **Team.** Owners can add staff accounts and change their own password. Staff can
 manage inventory and leads but not the team.
 
+## Performance metrics
+
+The dashboard opens with six numbers:
+
+| Metric | Where it comes from |
+| ------ | ------------------- |
+| Avg. days on market | Time between a vehicle first going **Live** and being marked **Sold** |
+| Avg. sold vs. asking | Sale price as a share of the price it was *first* listed at |
+| Longest on the lot | Oldest vehicle still live, and which one |
+| Total leads | Every enquiry ever received |
+| Site visits | Distinct browsing sessions in the last 30 days |
+| Avg. time on site | Average session length over the same window |
+
+Two things make these work:
+
+- **The listing clock starts when a vehicle goes Live**, not when it's created, so
+  time spent as an unphotographed draft isn't counted against it. It's stamped once
+  and never reset — relisting a returned truck won't wipe its history.
+- **Marking a vehicle sold asks for the final price.** That figure is the only way
+  "sold vs. asking" can exist. It's optional, so it never blocks recording a sale,
+  but a sale saved without it is left out of that average rather than distorting it.
+
+A metric with no data shows a dash and says why, rather than a zero — "no sales yet"
+and "sold at 0% of asking" mean very different things.
+
+### About the visitor tracking
+
+Visits are recorded by the site itself, into your own database. No third-party
+analytics, no cookies, no IP addresses, no fingerprinting — a session id generated
+in the browser and held in `sessionStorage`, the page path, and how long the visitor
+stayed. Nothing that identifies a person, which is why there is no consent banner.
+
+Obvious crawlers are filtered by user agent so they don't inflate the counts. Bots
+that disguise themselves will still get through; the numbers are a good indicator,
+not an audited figure.
+
+Sessions last as long as a browser tab. Someone who returns tomorrow counts as a new
+visit, which is the usual convention.
+
 ## Changing the dealership's details
 
 Phone number, address, hours, rating, the body types offered, and the equipment
