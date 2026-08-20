@@ -53,7 +53,7 @@ export default async function FinancingPage() {
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_1fr]">
-        <PaymentCalculator price={samplePrice} />
+        <PaymentCalculator price={samplePrice} editablePrice />
 
         <div className="space-y-6">
           <div className="rounded-card border border-ink-200 bg-white p-6">

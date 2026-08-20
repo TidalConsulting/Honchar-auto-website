@@ -5,13 +5,39 @@ import { useMemo, useState } from "react";
 import { FINANCE_DEFAULTS, TERM_OPTIONS, monthlyPayment } from "@/lib/finance";
 import { formatPrice } from "@/lib/format";
 
-export function PaymentCalculator({ price }: { price: number }) {
-  const [down, setDown] = useState(
-    Math.round((price * FINANCE_DEFAULTS.downPaymentPercent) / 100),
-  );
+const MAX_PRICE = 500_000;
+
+const defaultDown = (value: number) =>
+  Math.round((value * FINANCE_DEFAULTS.downPaymentPercent) / 100);
+
+export function PaymentCalculator({
+  price: initialPrice,
+  editablePrice = false,
+}: {
+  price: number;
+  /**
+   * Lets the shopper type in their own vehicle price. On a truck's own page the
+   * price is that truck's, so this stays off; on the standalone financing page
+   * there is no truck, so the price has to be theirs to set.
+   */
+  editablePrice?: boolean;
+}) {
+  const [price, setPrice] = useState(initialPrice);
+  const [down, setDown] = useState(defaultDown(initialPrice));
   const [term, setTerm] = useState<number>(FINANCE_DEFAULTS.termMonths);
   const [apr, setApr] = useState<number>(FINANCE_DEFAULTS.apr);
   const [tradeIn, setTradeIn] = useState(0);
+
+  // Keep the down payment sensible as the price changes: follow the default
+  // percentage until the shopper sets their own, then just keep it in range.
+  const [downTouched, setDownTouched] = useState(false);
+  const [lastPrice, setLastPrice] = useState(initialPrice);
+  if (price !== lastPrice) {
+    setLastPrice(price);
+    if (!downTouched) setDown(defaultDown(price));
+    else if (down > price) setDown(price);
+    if (tradeIn > price) setTradeIn(price);
+  }
 
   const payment = useMemo(
     () => monthlyPayment({ price, downPayment: down, apr, termMonths: term, tradeIn }),
@@ -24,8 +50,34 @@ export function PaymentCalculator({ price }: { price: number }) {
     <div className="rounded-card border border-ink-200 bg-white p-5">
       <h3 className="text-lg font-bold text-ink-900">Estimate your payment</h3>
       <p className="mt-1 text-sm text-ink-600">
-        Adjust the numbers to see what this truck looks like monthly.
+        {editablePrice
+          ? "Put in a price and adjust the numbers to see the monthly."
+          : "Adjust the numbers to see what this truck looks like monthly."}
       </p>
+
+      {editablePrice && (
+        <label className="mt-5 block">
+          <span className="mb-1 block text-sm font-semibold text-ink-800">Vehicle price</span>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400">
+              $
+            </span>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={MAX_PRICE}
+              step={500}
+              value={price === 0 ? "" : price}
+              onChange={(event) => {
+                const next = Number(event.target.value.replace(/[^0-9]/g, ""));
+                setPrice(Math.min(Number.isFinite(next) ? next : 0, MAX_PRICE));
+              }}
+              className="w-full rounded-lg border border-ink-300 py-2.5 pl-7 pr-3 text-lg font-bold text-ink-900 focus:border-amber-brand-400"
+            />
+          </div>
+        </label>
+      )}
 
       <div className="mt-5 rounded-xl bg-ink-900 px-5 py-4 text-center">
         <p className="text-xs uppercase tracking-wider text-ink-400">Estimated monthly payment</p>
@@ -46,7 +98,10 @@ export function PaymentCalculator({ price }: { price: number }) {
           max={price}
           step={500}
           display={formatPrice(down)}
-          onChange={setDown}
+          onChange={(value) => {
+            setDownTouched(true);
+            setDown(value);
+          }}
         />
         <Slider
           label="Trade-in value"
