@@ -94,6 +94,27 @@ disappears permanently once an account exists.
 DNS records to paste at the registrar. Then set `NEXT_PUBLIC_SITE_URL` to the real domain
 and redeploy so canonical links and the sitemap point at it.
 
+### Putting up a test version first
+
+A test site is the same deployment as production, minus the domain. Deploy to
+Vercel and use the `*.vercel.app` URL it hands back — that URL is the test site.
+Point the custom domain at it only when you're ready to go live.
+
+Test and preview deployments protect themselves:
+
+- **They are closed to search engines.** `robots.txt` returns `Disallow: /` on
+  any non-production deployment, so sample inventory is never indexed under the
+  dealership's name.
+- **They say so on screen.** An amber bar across the top marks the site as a
+  preview with sample data.
+
+On Vercel this is automatic — `VERCEL_ENV` distinguishes production from
+preview. Hosting elsewhere, set `NEXT_PUBLIC_SITE_ENV=test` on the test
+deployment to get the same behaviour.
+
+To keep the test site away from the public entirely, Vercel Pro's Deployment
+Protection can require a login before the preview URL loads.
+
 ### After it's live
 
 - **Search engines.** `robots.txt` and `sitemap.xml` are generated automatically, and the
