@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { ImageUploader, type UploadedImage } from "@/components/admin/ImageUploader";
+import { CHECKBOX, FIELD, LABEL, TEXTAREA, fieldBorder } from "@/components/admin/fieldStyles";
 import type { VehicleFormState } from "@/app/actions/vehicles";
 import {
   AXLE_CONFIGS,
@@ -206,7 +207,7 @@ export function VehicleForm({
                 type="checkbox"
                 checked={features.includes(feature)}
                 onChange={() => toggleFeature(feature)}
-                className="h-4 w-4 rounded border-ink-300 accent-amber-brand-500"
+                className={CHECKBOX}
               />
               <span className="text-ink-700">{feature}</span>
             </label>
@@ -226,7 +227,7 @@ export function VehicleForm({
               }
             }}
             placeholder="Add something else — e.g. “Snow plow mount”"
-            className="min-w-64 flex-1 rounded-lg border border-ink-300 px-3 py-2 text-sm focus:border-amber-brand-400"
+            className={`min-w-64 flex-1 ${FIELD} border-ink-300`}
           />
           <button
             type="button"
@@ -235,7 +236,7 @@ export function VehicleForm({
               if (value && !features.includes(value)) setFeatures((current) => [...current, value]);
               setCustomFeature("");
             }}
-            className="rounded-lg border border-ink-300 px-4 py-2 text-sm font-semibold text-ink-700 hover:bg-ink-50"
+            className="h-12 rounded-lg border border-ink-300 px-5 text-base font-semibold text-ink-700 hover:bg-ink-50"
           >
             Add
           </button>
@@ -248,7 +249,7 @@ export function VehicleForm({
           rows={7}
           defaultValue={vehicle.description ?? ""}
           placeholder="Single-owner municipal truck, serviced every 250 hours. New brakes and tires at 118k. Bed liner in good shape, hoist tested under load."
-          className="w-full rounded-lg border border-ink-300 px-3 py-2.5 text-sm leading-relaxed text-ink-900 placeholder:text-ink-400 focus:border-amber-brand-400"
+          className={`${TEXTAREA} border-ink-300`}
         />
       </Card>
 
@@ -345,13 +346,13 @@ function Input({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-semibold text-ink-800">
+      <span className={LABEL}>
         {label}
         {required && <span className="ml-0.5 text-amber-brand-600">*</span>}
       </span>
       <div className="relative">
         {prefix && (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-400">
+          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-base text-ink-400">
             {prefix}
           </span>
         )}
@@ -362,12 +363,12 @@ function Input({
           required={required}
           placeholder={placeholder}
           defaultValue={defaultValue ?? ""}
-          className={`w-full rounded-lg border px-3 py-2.5 text-sm text-ink-900 placeholder:text-ink-400 focus:border-amber-brand-400 ${
-            error ? "border-red-400" : "border-ink-300"
-          } ${prefix ? "pl-7" : ""} ${suffix ? "pr-12" : ""}`}
+          className={`${FIELD} ${fieldBorder(!!error)} ${prefix ? "pl-8" : ""} ${
+            suffix ? "pr-14" : ""
+          }`}
         />
         {suffix && (
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-ink-400">
+          <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-base text-ink-400">
             {suffix}
           </span>
         )}
@@ -400,7 +401,7 @@ function Select({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-semibold text-ink-800">
+      <span className={LABEL}>
         {label}
         {required && <span className="ml-0.5 text-amber-brand-600">*</span>}
       </span>
@@ -408,9 +409,7 @@ function Select({
         name={name}
         required={required}
         defaultValue={defaultValue ?? (allowEmpty ? "" : options[0]?.value)}
-        className={`w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-ink-900 focus:border-amber-brand-400 ${
-          error ? "border-red-400" : "border-ink-300"
-        }`}
+        className={`${FIELD} ${fieldBorder(!!error)}`}
       >
         {(allowEmpty || !defaultValue) && <option value="">— Select —</option>}
         {options.map((option) => (
@@ -434,12 +433,12 @@ function Checkbox({
   defaultChecked?: boolean;
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-ink-800">
+    <label className="flex cursor-pointer items-center gap-2.5 text-base font-medium text-ink-800">
       <input
         type="checkbox"
         name={name}
         defaultChecked={defaultChecked}
-        className="h-4.5 w-4.5 rounded border-ink-300 accent-amber-brand-500"
+        className={CHECKBOX}
       />
       {label}
     </label>

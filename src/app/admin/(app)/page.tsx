@@ -115,11 +115,11 @@ export default async function AdminInventoryPage({
             name="q"
             defaultValue={query}
             placeholder="Search make, model, stock #, VIN"
-            className="w-64 rounded-lg border border-ink-300 px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 focus:border-amber-brand-400"
+            className="h-12 w-64 rounded-lg border border-ink-300 bg-white px-3.5 text-base text-ink-900 placeholder:text-ink-400 focus:border-amber-brand-400"
           />
           <button
             type="submit"
-            className="rounded-lg bg-ink-900 px-4 py-2 text-sm font-semibold text-white hover:bg-ink-800"
+            className="h-12 rounded-lg bg-ink-900 px-5 text-base font-semibold text-white hover:bg-ink-800"
           >
             Search
           </button>
