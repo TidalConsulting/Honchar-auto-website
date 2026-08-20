@@ -56,6 +56,14 @@ export async function createFirstUser(
     return { error: parsed.error.issues[0]?.message ?? "Check the form and try again." };
   }
 
+  // Optional guard for deployments on a public URL with no password in front
+  // of them: when SETUP_EMAIL is set, only that address can claim the owner
+  // account. Unset, the form works for whoever reaches it first.
+  const allowed = process.env.SETUP_EMAIL?.trim().toLowerCase();
+  if (allowed && parsed.data.email !== allowed) {
+    return { error: "That email address isn't authorised to set up this site." };
+  }
+
   const user = await prisma.user.create({
     data: {
       name: parsed.data.name,
