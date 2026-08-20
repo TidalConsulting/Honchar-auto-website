@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/Logo";
+import { pluralize } from "@/lib/format";
 import { addressLine, site, BODY_TYPES } from "@/lib/site";
 
 export function SiteFooter() {
@@ -29,7 +30,7 @@ export function SiteFooter() {
                   href={`/inventory?body=${encodeURIComponent(type)}`}
                   className="text-ink-400 transition-colors hover:text-white"
                 >
-                  {type}s
+                  {pluralize(type)}
                 </Link>
               </li>
             ))}

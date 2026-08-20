@@ -1,3 +1,20 @@
+import Image from "next/image";
+
+/**
+ * Brand lockup.
+ *
+ * Drop the real logo artwork in at `public/logo.svg` (or .png) and set
+ * LOGO_FILE below — it then renders everywhere the mark appears. Until then
+ * this draws a typographic stand-in using the brand's own navy and grey and
+ * the roof motif from the badge, so nothing on the site is off-brand.
+ *
+ * The supplied artwork sits on a white background, so on the dark footer it is
+ * placed on a white chip rather than knocked out — that keeps the vehicle
+ * line art intact instead of flattening it to a silhouette.
+ */
+const LOGO_FILE: string | null = null;
+const LOGO_ASPECT = 1500 / 971; // width / height of the supplied badge
+
 export function Logo({
   className = "",
   tone = "dark",
@@ -5,35 +22,62 @@ export function Logo({
   className?: string;
   tone?: "dark" | "light";
 }) {
-  const word = tone === "light" ? "#ffffff" : "var(--color-ink-900)";
-  const sub = tone === "light" ? "#ffffffb3" : "var(--color-ink-500)";
+  if (LOGO_FILE) {
+    const height = 44;
+    return tone === "light" ? (
+      <span className={`inline-flex rounded-lg bg-white px-2.5 py-1.5 ${className}`}>
+        <Image
+          src={LOGO_FILE}
+          alt="Honchar Auto"
+          width={Math.round(height * LOGO_ASPECT)}
+          height={height}
+          priority
+        />
+      </span>
+    ) : (
+      <span className={`inline-flex ${className}`}>
+        <Image
+          src={LOGO_FILE}
+          alt="Honchar Auto"
+          width={Math.round(height * LOGO_ASPECT)}
+          height={height}
+          priority
+        />
+      </span>
+    );
+  }
+
+  const navy = tone === "light" ? "#ffffff" : "var(--color-brand-navy)";
+  const grey = tone === "light" ? "#ffffffb3" : "var(--color-brand-grey)";
 
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <svg viewBox="0 0 44 32" className="h-8 w-11 shrink-0" aria-hidden="true">
+      {/* Roof and chevron from the badge — the nod to the remodeling business. */}
+      <svg viewBox="0 0 40 34" className="h-9 w-10 shrink-0" aria-hidden="true">
         <path
-          d="M2 22V9a2 2 0 0 1 2-2h17a2 2 0 0 1 2 2v13H2Z"
-          fill="var(--color-amber-brand-400)"
+          d="M20 3 37 17h-6L20 8.5 9 17H3L20 3Z"
+          fill={navy}
         />
-        <path d="M25 22V12h8l7 6v4H25Z" fill="var(--color-ink-800)" />
-        <path d="M27 14h5.4l4 3.6H27V14Z" fill="var(--color-amber-brand-200)" />
-        <circle cx="12" cy="24" r="5" fill="var(--color-ink-900)" />
-        <circle cx="12" cy="24" r="2" fill="var(--color-ink-300)" />
-        <circle cx="33" cy="24" r="5" fill="var(--color-ink-900)" />
-        <circle cx="33" cy="24" r="2" fill="var(--color-ink-300)" />
+        <rect x="16" y="13.5" width="3.4" height="3.4" fill={grey} />
+        <rect x="20.6" y="13.5" width="3.4" height="3.4" fill={grey} />
+        <rect x="16" y="18.1" width="3.4" height="3.4" fill={grey} />
+        <rect x="20.6" y="18.1" width="3.4" height="3.4" fill={grey} />
+        <path d="M3 24h34L20 33 3 24Z" fill={navy} />
+        <path d="M9.5 27.4h21L20 33 9.5 27.4Z" fill={grey} opacity="0.55" />
       </svg>
+
       <span className="flex flex-col leading-none">
         <span
-          className="text-[1.35rem] font-extrabold tracking-tight"
-          style={{ color: word }}
+          className="font-serif text-[1.4rem] font-bold leading-none tracking-[0.01em]"
+          style={{ color: navy }}
         >
-          Honchar<span style={{ color: "var(--color-amber-brand-500)" }}>Auto</span>
+          HONCHAR
         </span>
         <span
-          className="mt-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.18em]"
-          style={{ color: sub }}
+          className="mt-1 text-[0.62rem] font-semibold uppercase leading-none tracking-[0.42em]"
+          style={{ color: grey }}
         >
-          Work Truck Specialists
+          Auto
         </span>
       </span>
     </span>

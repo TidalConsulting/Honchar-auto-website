@@ -24,7 +24,14 @@
   --color-amber-brand-800: #94380c;
   --color-amber-brand-900: #7a300d;
 
+  /* Brand colours taken from the Honchar Auto badge. */
+  --color-brand-navy: #1e2d4f;
+  --color-brand-navy-dark: #14203a;
+  --color-brand-grey: #6f757c;
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Echoes the slab-serif wordmark on the badge. */
+  --font-serif: Georgia, "Times New Roman", ui-serif, serif;
 
   --radius-card: 0.875rem;
 }

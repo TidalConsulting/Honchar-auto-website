@@ -6,6 +6,7 @@ import { InventoryFilters } from "@/components/InventoryFilters";
 import { FilterChips, Pagination, SortSelect } from "@/components/InventoryToolbar";
 import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
 import { VehicleCard } from "@/components/VehicleCard";
+import { pluralize } from "@/lib/format";
 import { cityState } from "@/lib/site";
 import { getInventory, parseFilters, type SearchParams } from "@/lib/vehicles";
 
@@ -26,7 +27,10 @@ export default async function InventoryPage({
   const filters = parseFilters(params);
   const result = await getInventory(filters);
 
-  const heading = filters.bodyType.length === 1 ? `${filters.bodyType[0]}s for sale` : "Trucks & equipment for sale";
+  const heading =
+    filters.bodyType.length === 1
+      ? `${pluralize(filters.bodyType[0])} for sale`
+      : "Trucks & vans for sale";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

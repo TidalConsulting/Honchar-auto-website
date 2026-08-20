@@ -66,3 +66,14 @@ export function slugify(input: string) {
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
 }
+
+/**
+ * Pluralises a body type for headings and nav links.
+ * Handles the -y case ("Service / Utility" -> "Service / Utilities") that a
+ * bare "+ s" gets wrong.
+ */
+export function pluralize(label: string) {
+  if (/[^aeiou]y$/i.test(label)) return `${label.slice(0, -1)}ies`;
+  if (/(s|x|z|ch|sh)$/i.test(label)) return `${label}es`;
+  return `${label}s`;
+}

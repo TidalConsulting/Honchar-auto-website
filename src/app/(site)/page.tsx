@@ -195,8 +195,8 @@ function FeaturedRow({
 function ValueProps() {
   const items = [
     {
-      title: "Inspected before it&rsquo;s listed",
-      body: "We&rsquo;re contractors. Every truck and van is picked and checked over the way we&rsquo;d check one we were going to run ourselves.",
+      title: "Inspected before it’s listed",
+      body: "We’re contractors. Every truck and van is picked and checked over the way we’d check one we were going to run ourselves.",
       icon: <ShieldIcon />,
     },
     {
@@ -227,10 +227,7 @@ function ValueProps() {
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-brand-50 text-amber-brand-600">
               {item.icon}
             </div>
-            <h3
-              className="mt-4 text-base font-bold text-ink-900"
-              dangerouslySetInnerHTML={{ __html: item.title }}
-            />
+            <h3 className="mt-4 text-base font-bold text-ink-900">{item.title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-600">{item.body}</p>
           </div>
         ))}
