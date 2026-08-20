@@ -6,6 +6,7 @@ import { InventoryFilters } from "@/components/InventoryFilters";
 import { FilterChips, Pagination, SortSelect } from "@/components/InventoryToolbar";
 import { MobileFilterDrawer } from "@/components/MobileFilterDrawer";
 import { VehicleCard } from "@/components/VehicleCard";
+import { cityState } from "@/lib/site";
 import { getInventory, parseFilters, type SearchParams } from "@/lib/vehicles";
 
 export const metadata: Metadata = {
@@ -35,8 +36,8 @@ export default async function InventoryPage({
             {heading}
           </h1>
           <p className="mt-2 text-ink-600">
-            {result.total.toLocaleString()} vehicles on the lot in Tampa, FL — inspected, road
-            tested, and priced up front.
+            {result.total.toLocaleString()} vehicles on the lot{cityState ? ` in ${cityState}` : ""} —
+            inspected by contractors, priced up front.
           </p>
         </div>
         <div className="flex items-center gap-3">

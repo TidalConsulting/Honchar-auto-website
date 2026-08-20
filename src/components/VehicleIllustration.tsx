@@ -122,6 +122,12 @@ function wheelPositions(bodyType: string): { x: number; r: number }[] {
         { x: 205, r: 54 },
         { x: 596, r: 54 },
       ];
+    case "Cargo Van":
+    case "Passenger Van":
+      return [
+        { x: 200, r: 50 },
+        { x: 610, r: 50 },
+      ];
     default:
       return [
         { x: 180, r: 52 },
@@ -217,6 +223,37 @@ function shapeFor(
           {/* hoist cylinder */}
           <rect x="330" y="318" width="46" height="14" rx="6" fill="#7a828e" />
           <CabOver fill={fill} glass={glass} glassDark={glassDark} />
+        </g>
+      );
+
+    case "Cargo Van":
+    case "Passenger Van":
+      return (
+        <g>
+          <Frame from={200} to={660} chassis={chassis} />
+          <path
+            d="M120 340 L120 250 Q120 232 152 214 L236 176 Q252 168 288 168 L660 168 Q690 168 690 196 L690 340 Z"
+            fill={fill}
+            stroke="#00000033"
+            strokeWidth="2"
+          />
+          {/* windshield + cab glass */}
+          <path d="M170 214 L246 186 Q256 182 282 182 L300 182 L300 236 L152 236 Z" fill={glass} />
+          <path d="M170 214 L210 196 L196 236 L152 236 Z" fill={glassDark} opacity="0.45" />
+          {bodyType === "Passenger Van" ? (
+            <>
+              <rect x="320" y="186" width="150" height="52" rx="5" fill={glass} />
+              <rect x="490" y="186" width="150" height="52" rx="5" fill={glass} />
+            </>
+          ) : (
+            <>
+              {/* cargo body: seam lines and a rear door edge */}
+              <rect x="320" y="182" width="330" height="10" fill={paint.light} opacity="0.6" />
+              <rect x="596" y="200" width="82" height="126" rx="4" fill="#00000012" />
+            </>
+          )}
+          <rect x="120" y="318" width="570" height="14" fill="#00000018" />
+          <rect x="124" y="276" width="16" height="30" rx="4" fill="#f2d98c" />
         </g>
       );
 

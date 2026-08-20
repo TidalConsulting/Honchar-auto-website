@@ -16,7 +16,7 @@ import {
   formatWeight,
   vehicleTitle,
 } from "@/lib/format";
-import { addressLine, site } from "@/lib/site";
+import { addressLine, cityState, locationLabel, site } from "@/lib/site";
 import { getSimilarVehicles, getVehicleBySlug } from "@/lib/vehicles";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description:
       vehicle.description?.slice(0, 180) ??
-      `${vehicleTitle(vehicle)} ${vehicle.bodyType} for sale at ${site.name} in ${site.address.city}, ${site.address.state}.`,
+      `${vehicleTitle(vehicle)} ${vehicle.bodyType} for sale at ${site.name}${cityState ? ` in ${cityState}` : ""}.`,
   };
 }
 
@@ -90,7 +90,7 @@ export default async function VehicleDetailPage({ params }: Props) {
     { label: "VIN", value: vehicle.vin ?? "—" },
     { label: "Doors", value: vehicle.doors ? formatNumber(vehicle.doors) : "—" },
     { label: "Seats", value: vehicle.seats ? formatNumber(vehicle.seats) : "—" },
-    { label: "Located at", value: vehicle.location ?? `${site.address.city}, ${site.address.state}` },
+    { label: "Located at", value: vehicle.location ?? cityState ?? locationLabel },
   ];
 
   return (
@@ -232,13 +232,16 @@ export default async function VehicleDetailPage({ params }: Props) {
 
             <div className="rounded-card border border-ink-200 bg-white p-5">
               <h3 className="text-base font-bold text-ink-900">{site.name}</h3>
-              <div className="mt-1 flex items-center gap-1.5 text-sm text-ink-600">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-amber-brand-400" fill="currentColor">
-                  <path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6.1L12 16.8 6.6 19.7l1.2-6.1L3.3 9.4l6.1-.8L12 3Z" />
-                </svg>
-                {site.rating} · {site.reviewCount} reviews
-              </div>
-              <p className="mt-3 text-sm text-ink-600">{addressLine}</p>
+              {site.reviews && (
+                <div className="mt-1 flex items-center gap-1.5 text-sm text-ink-600">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 text-amber-brand-400" fill="currentColor">
+                    <path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6.1L12 16.8 6.6 19.7l1.2-6.1L3.3 9.4l6.1-.8L12 3Z" />
+                  </svg>
+                  {site.reviews.rating} · {site.reviews.count}{" "}
+                  {site.reviews.count === 1 ? "review" : "reviews"}
+                </div>
+              )}
+              {addressLine && <p className="mt-3 text-sm text-ink-600">{addressLine}</p>}
               <a
                 href={site.phoneHref}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-ink-300 px-5 py-3 text-sm font-bold text-ink-900 hover:bg-ink-50"

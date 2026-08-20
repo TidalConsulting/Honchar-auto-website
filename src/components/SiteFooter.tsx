@@ -61,12 +61,18 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-white">Visit the lot</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-white">
+            {site.address ? "Visit the lot" : "Get in touch"}
+          </h2>
           <address className="mt-4 space-y-1 text-sm not-italic text-ink-400">
-            <div>{site.address.street}</div>
-            <div>
-              {site.address.city}, {site.address.state} {site.address.zip}
-            </div>
+            {site.address && (
+              <>
+                <div>{site.address.street}</div>
+                <div>
+                  {site.address.city}, {site.address.state} {site.address.zip}
+                </div>
+              </>
+            )}
             <a href={`mailto:${site.email}`} className="mt-2 inline-block hover:text-white">
               {site.email}
             </a>
@@ -89,7 +95,7 @@ export function SiteFooter() {
           </p>
           <p className="max-w-2xl">
             Prices exclude tax, tag, title, and dealer fees. Payment estimates are for
-            illustration only and are not a financing offer. {addressLine}
+            illustration only and are not a financing offer.{addressLine ? ` ${addressLine}` : ""}
           </p>
         </div>
       </div>

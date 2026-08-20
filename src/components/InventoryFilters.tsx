@@ -74,9 +74,11 @@ export function InventoryFilters({
 
       <Section title="Location" defaultOpen>
         <div className="space-y-2 text-sm text-ink-600">
-          <p className="font-semibold text-ink-900">
-            {site.address.city}, {site.address.state} {site.address.zip}
-          </p>
+          {site.address && (
+            <p className="font-semibold text-ink-900">
+              {site.address.city}, {site.address.state} {site.address.zip}
+            </p>
+          )}
           <p>Every truck listed is on our lot and available to inspect in person.</p>
           <p className="text-ink-500">Nationwide delivery available on request.</p>
         </div>

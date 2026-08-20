@@ -52,8 +52,8 @@ function Hero({ count, startingPrice }: { count: number; startingPrice: number }
           </h1>
 
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-300">
-            Dump trucks, flatbeds, box trucks, and heavy equipment — inspected, road tested, and
-            priced up front. No haggling, no surprise fees, no wasted job days.
+            Pickups, cargo vans, dump trucks, and flatbeds — picked and inspected by contractors
+            who run this stuff every day. Straightforward deals, no pressure, no wasted job days.
           </p>
 
           <div className="mt-8 max-w-xl">
@@ -67,7 +67,9 @@ function Hero({ count, startingPrice }: { count: number; startingPrice: number }
                 label: "Starting at",
                 value: startingPrice ? formatPrice(startingPrice) : "—",
               },
-              { label: "Customer rating", value: `${site.rating}★` },
+              site.reviews
+                ? { label: "Customer rating", value: `${site.reviews.rating}★` }
+                : { label: "Family owned", value: site.address?.city ?? "Local" },
             ].map((stat) => (
               <div key={stat.label}>
                 <dt className="text-xs uppercase tracking-wider text-ink-400">{stat.label}</dt>
@@ -84,7 +86,7 @@ function Hero({ count, startingPrice }: { count: number; startingPrice: number }
           <div className="absolute -bottom-6 -left-6 rounded-xl border border-white/10 bg-ink-900 px-5 py-4 shadow-xl">
             <p className="text-xs uppercase tracking-wider text-ink-400">Every truck includes</p>
             <p className="mt-1 text-sm font-bold text-white">
-              150-point inspection + service records
+              Inspected like we&apos;d use it ourselves
             </p>
           </div>
         </div>
@@ -194,12 +196,12 @@ function ValueProps() {
   const items = [
     {
       title: "Inspected before it&rsquo;s listed",
-      body: "Every truck gets a 150-point mechanical and safety inspection. You get the report before you sign anything.",
+      body: "We&rsquo;re contractors. Every truck and van is picked and checked over the way we&rsquo;d check one we were going to run ourselves.",
       icon: <ShieldIcon />,
     },
     {
-      title: "One price, printed up front",
-      body: "The number on the listing is the number on the paperwork. No prep fees, no reconditioning add-ons.",
+      title: "No games, no pressure",
+      body: "The number on the listing is the number on the paperwork. Straightforward deals, and nobody chasing you around the lot.",
       icon: <TagIcon />,
     },
     {
@@ -209,7 +211,7 @@ function ValueProps() {
     },
     {
       title: "We buy trucks too",
-      body: "Bring in your old unit for a real offer in 30 minutes. Trade it or take the check — no obligation.",
+      body: "Bring in your old unit for a real offer. Trade it toward the next one or take the check — no obligation.",
       icon: <SwapIcon />,
     },
   ];

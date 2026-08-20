@@ -583,7 +583,7 @@ async function main() {
         features,
         slug: slugify(base),
         stockNumber: `HA-${stock++}`,
-        location: "Tampa, FL",
+        location: "Cape Coral, FL",
         status: vehicle.status ?? "PUBLISHED",
       },
     });

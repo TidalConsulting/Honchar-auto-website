@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 import { LeadForm } from "@/components/LeadForm";
-import { addressLine, site } from "@/lib/site";
+import { addressLine, cityState, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Call, email, or visit ${site.name} in ${site.address.city}, ${site.address.state}.`,
+  description: `Call, email, or visit ${site.name}${cityState ? ` in ${cityState}` : ""}.`,
 };
 
 export default function ContactPage() {
@@ -25,7 +25,7 @@ export default function ContactPage() {
         <div className="space-y-5">
           <InfoCard title="Call or text" body={site.phone} href={site.phoneHref} />
           <InfoCard title="Email" body={site.email} href={`mailto:${site.email}`} />
-          <InfoCard title="Visit the lot" body={addressLine} />
+          {addressLine && <InfoCard title="Visit the lot" body={addressLine} />}
 
           <div className="rounded-card border border-ink-200 bg-white p-6">
             <h2 className="text-base font-bold text-ink-900">Hours</h2>

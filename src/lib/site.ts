@@ -2,41 +2,77 @@
  * Single source of truth for dealership contact info and copy.
  * Edit this file to update the phone number, address, and hours everywhere.
  */
+type Address = { street: string; city: string; state: string; zip: string };
+type Reviews = { rating: number; count: number };
+
 export const site = {
   name: "Honchar Auto",
   tagline: "Work-ready trucks and construction vehicles",
   description:
-    "Honchar Auto sells dump trucks, flatbeds, box trucks, and heavy-duty work vehicles. Inspected, road-tested, and priced up front.",
-  phone: "(813) 555-0142",
-  phoneHref: "tel:+18135550142",
+    "Family-owned dealership selling reliable, work-ready trucks and vans — pickups, cargo vans, dump trucks, and flatbeds. Selected and inspected by contractors who run them every day.",
+
+  phone: "(239) 251-8433",
+  phoneHref: "tel:+12392518433",
   email: "sales@honcharauto.com",
+
+  /**
+   * Set to null to omit every address block site-wide, rather than showing a
+   * placeholder — a wrong address on a dealership site sends customers to the
+   * wrong place, so this fails closed on purpose.
+   */
   address: {
-    street: "4820 Industrial Park Blvd",
-    city: "Tampa",
+    street: "722 El Dorado Blvd N",
+    city: "Cape Coral",
     state: "FL",
-    zip: "33619",
-  },
+    zip: "33993",
+  } as Address | null,
+
+  /**
+   * Star rating and review count, shown on listing cards and the detail page.
+   * Null hides them everywhere.
+   *
+   * Currently null deliberately: the Google Business Profile has a 5.0 rating
+   * from a single review, and "5.0 from 1 review" reads thinner than showing
+   * nothing. Set it to { rating: 5.0, count: 1 } to switch the rating UI on,
+   * or update the numbers once there are more reviews to point at.
+   */
+  reviews: null as Reviews | null,
+
+  /** Matches the hours published on the Google Business Profile. */
   hours: [
-    { days: "Monday – Friday", time: "8:00 AM – 6:00 PM" },
-    { days: "Saturday", time: "9:00 AM – 4:00 PM" },
-    { days: "Sunday", time: "Closed" },
+    { days: "Monday – Saturday", time: "7:00 AM – 9:00 PM" },
+    { days: "Sunday", time: "8:00 AM – 4:00 PM" },
   ],
-  rating: 4.8,
-  reviewCount: 212,
 } as const;
 
-export const addressLine = `${site.address.street}, ${site.address.city}, ${site.address.state} ${site.address.zip}`;
+/** Full one-line address, or null when no address is configured. */
+export const addressLine: string | null = site.address
+  ? `${site.address.street}, ${site.address.city}, ${site.address.state} ${site.address.zip}`
+  : null;
 
-/** Body types offered. Order drives the landing page tiles and filter list. */
+/** "Fort Myers, FL" — used on listing cards and the detail page. Null when unset. */
+export const cityState: string | null = site.address
+  ? `${site.address.city}, ${site.address.state}`
+  : null;
+
+/** Where the lot is, for page copy. Falls back to the business name. */
+export const locationLabel = cityState ?? site.name;
+
+/**
+ * Body types offered. Order drives the landing page tiles and filter list.
+ * Trim this to what's actually stocked — an empty category shows "0 available".
+ */
 export const BODY_TYPES = [
+  "Pickup Truck",
+  "Cargo Van",
   "Dump Truck",
   "Flatbed",
   "Box Truck",
-  "Pickup Truck",
-  "Roll-Off",
   "Service / Utility",
-  "Concrete Mixer",
+  "Passenger Van",
+  "Roll-Off",
   "Bucket / Boom",
+  "Concrete Mixer",
   "Semi Tractor",
   "Trailer",
 ] as const;

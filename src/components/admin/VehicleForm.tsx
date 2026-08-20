@@ -181,7 +181,7 @@ export function VehicleForm({
           <Input name="doors" label="Doors" type="number" defaultValue={vehicle.doors ?? ""} />
           <Input name="seats" label="Seats" type="number" defaultValue={vehicle.seats ?? ""} />
           <Input name="vin" label="VIN" placeholder="1FVACWDT8HH..." defaultValue={vehicle.vin ?? ""} />
-          <Input name="location" label="Lot location" placeholder="Tampa, FL" defaultValue={vehicle.location ?? ""} />
+          <Input name="location" label="Lot location" placeholder="Cape Coral, FL" defaultValue={vehicle.location ?? ""} />
         </div>
 
         <div className="mt-5 flex flex-wrap gap-6">

@@ -4,7 +4,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { VehiclePhoto } from "@/components/VehiclePhoto";
 import { estimatedMonthly } from "@/lib/finance";
 import { formatHours, formatMileage, formatPrice, formatWeight, vehicleTitle } from "@/lib/format";
-import { site } from "@/lib/site";
+import { cityState, site } from "@/lib/site";
 import type { VehicleCard as VehicleCardData } from "@/lib/vehicles";
 
 const CONDITION_LABEL: Record<string, string> = {
@@ -96,10 +96,18 @@ export function VehicleCard({
         <div className="mt-auto pt-4">
           <div className="flex items-center gap-1.5 text-xs text-ink-500">
             <span className="font-semibold text-ink-700">{site.name}</span>
-            <StarIcon className="h-3.5 w-3.5 text-amber-brand-400" />
-            <span>{site.rating}</span>
-            <span aria-hidden="true">·</span>
-            <span>{vehicle.location ?? `${site.address.city}, ${site.address.state}`}</span>
+            {site.reviews && (
+              <>
+                <StarIcon className="h-3.5 w-3.5 text-amber-brand-400" />
+                <span>{site.reviews.rating}</span>
+              </>
+            )}
+            {(vehicle.location ?? cityState) && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>{vehicle.location ?? cityState}</span>
+              </>
+            )}
           </div>
           {vehicle.stockNumber && (
             <p className="mt-1 text-xs text-ink-400">Stock #{vehicle.stockNumber}</p>

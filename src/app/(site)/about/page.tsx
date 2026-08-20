@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { addressLine, site } from "@/lib/site";
+import { addressLine, cityState, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `${site.name} sells inspected work trucks and construction vehicles in ${site.address.city}, ${site.address.state}.`,
+  description: `${site.name} is a family-owned dealership selling reliable, work-ready trucks and vans${cityState ? ` in ${cityState}` : ""}.`,
 };
 
 export default function AboutPage() {
@@ -17,32 +17,36 @@ export default function AboutPage() {
 
       <div className="mt-6 space-y-5 text-lg leading-relaxed text-ink-700">
         <p>
-          {site.name} started because buying a work truck was miserable. Auction units with no
-          history. Dealers who&apos;d never run a PTO in their lives. Prices that moved every time
-          you asked. Meanwhile a truck sitting in the shop is a crew standing around getting paid to
-          do nothing.
+          {site.name} is a family-owned dealership built from the same values behind our
+          remodeling business — hard work, honesty, and doing things the right way.
         </p>
         <p>
-          So we built the lot we wanted to buy from. Every unit gets a 150-point mechanical and
-          safety inspection before it&apos;s listed, and the report goes in your hands before you
-          sign anything. The price on the listing is the price on the paperwork — no prep fee, no
-          reconditioning fee, no doc-fee surprise at the desk.
+          As contractors, we know vehicles aren&apos;t just for getting around. They&apos;re how
+          you make a living. We rely on trucks and vans every day, so we understand what
+          actually holds up on the job.
         </p>
         <p>
-          We specialize in construction and vocational equipment: dump trucks, flatbeds, roll-offs,
-          service bodies, mixers, and the pickups that pull them. If we don&apos;t have what you
-          need, tell us and we&apos;ll go find it.
+          That&apos;s why we focus on providing reliable, work-ready vehicles that are carefully
+          selected and inspected like we&apos;d use them ourselves. No games, no pressure — just
+          straightforward deals and vehicles you can count on.
+        </p>
+        <p className="font-semibold text-ink-900">
+          At {site.name}, you&apos;re not just buying a car — you&apos;re investing in yourself
+          and your business.
         </p>
       </div>
 
       <dl className="mt-12 grid gap-5 sm:grid-cols-3">
         {[
-          { label: "Point inspection", value: "150" },
-          { label: "Customer rating", value: `${site.rating}★` },
-          { label: "Reviews", value: String(site.reviewCount) },
+          { label: "Family owned & operated", value: "Since day one" },
+          { label: "Run by contractors", value: "Not salespeople" },
+          {
+            label: "Where we are",
+            value: site.address ? `${site.address.city}, ${site.address.state}` : "Southwest Florida",
+          },
         ].map((stat) => (
           <div key={stat.label} className="rounded-card border border-ink-200 bg-white p-6 text-center">
-            <dd className="text-3xl font-extrabold text-ink-900">{stat.value}</dd>
+            <dd className="text-xl font-extrabold text-ink-900">{stat.value}</dd>
             <dt className="mt-1 text-sm text-ink-600">{stat.label}</dt>
           </div>
         ))}
@@ -50,7 +54,7 @@ export default function AboutPage() {
 
       <div className="mt-12 rounded-card bg-ink-900 p-8 text-center">
         <h2 className="text-2xl font-extrabold text-white">Come kick the tires</h2>
-        <p className="mt-2 text-ink-300">{addressLine}</p>
+        {addressLine && <p className="mt-2 text-ink-300">{addressLine}</p>}
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
             href="/inventory"
