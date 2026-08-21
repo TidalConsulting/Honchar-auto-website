@@ -50,7 +50,7 @@ export function Logo({
           ref={imgRef}
           src={LOGO_FILE}
           alt="Honchar Auto"
-          className="h-11 w-auto"
+          className="h-14 w-auto lg:h-16"
           onError={() => setArtworkFailed(true)}
         />
       </span>
