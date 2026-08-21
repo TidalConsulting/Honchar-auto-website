@@ -19,8 +19,8 @@ export default async function HomePage() {
   return (
     <>
       <Hero count={stats.count} startingPrice={stats.startingPrice} />
-      <BodyTypeTiles counts={counts} />
       <FeaturedRow vehicles={featured} />
+      <BodyTypeTiles counts={counts} />
       <ValueProps />
       <SellCta />
     </>
@@ -171,7 +171,7 @@ function FeaturedRow({
             href="/inventory"
             className="hidden shrink-0 rounded-full bg-ink-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-ink-800 sm:block"
           >
-            See all {vehicles.length > 0 ? "inventory" : ""}
+            See all inventory
           </Link>
         </div>
 
@@ -217,20 +217,22 @@ function ValueProps() {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <h2 className="text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">
-        Why crews buy from {site.name}
-      </h2>
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((item) => (
-          <div key={item.title} className="rounded-card border border-ink-200 bg-white p-6">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-brand-50 text-amber-brand-600">
-              {item.icon}
+    <section className="bg-white py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">
+          Why crews buy from {site.name}
+        </h2>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
+            <div key={item.title} className="rounded-card border border-ink-200 bg-ink-50 p-6">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-brand-100 text-amber-brand-700">
+                {item.icon}
+              </div>
+              <h3 className="mt-4 text-base font-bold text-ink-900">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-600">{item.body}</p>
             </div>
-            <h3 className="mt-4 text-base font-bold text-ink-900">{item.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink-600">{item.body}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -238,7 +240,7 @@ function ValueProps() {
 
 function SellCta() {
   return (
-    <section className="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 pb-4 pt-16 sm:px-6 lg:px-8">
       <div className="flex flex-col items-start gap-6 rounded-2xl bg-ink-900 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
